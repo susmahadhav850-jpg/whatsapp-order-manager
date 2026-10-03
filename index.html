@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WhatsApp Order Manager</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Inter, Arial, sans-serif;
+  background: #f5f7fb;
+  color: #172033;
+  min-height: 100vh;
+}
+
+header {
+  background: #ffffff;
+  border-bottom: 1px solid #e7eaf0;
+  padding: 18px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-inner {
+  max-width: 1100px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.logo-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #25d366;
+  color: white;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+}
+
+.container {
+  max-width: 1100px;
+  margin: auto;
+  padding: 28px 18px 80px;
+}
+
+.hero {
+  margin-bottom: 25px;
+}
+
+.hero h1 {
+  font-size: 30px;
+  margin-bottom: 7px;
+}
+
+.hero p {
+  color: #687386;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.stat {
+  background: white;
+  border: 1px solid #e8ebf0;
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 6px 20px rgba(20,30,50,.04);
+}
+
+.stat-label {
+  color: #7b8494;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 27px;
+  font-weight: 800;
+}
+
+.card {
+  background: white;
+  border: 1px solid #e8ebf0;
+  border-radius: 20px;
+  padding: 22px;
+  margin-bottom: 22px;
+  box-shadow: 0 6px 20px rgba(20,30,50,.04);
+}
+
+.card h2 {
+  font-size: 20px;
+  margin-bottom: 18px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.field.full {
+  grid-column: 1 / -1;
+}
+
+label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #586174;
+}
+
+input, select {
+  width: 100%;
+  border: 1px solid #dfe4ec;
+  border-radius: 12px;
+  padding: 13px 14px;
+  font-size: 15px;
+  outline: none;
+  background: #fff;
+}
+
+input:focus, select:focus {
+  border-color: #25d366;
+  box-shadow: 0 0 0 3px rgba(37,211,102,.12);
+}
+
+.total-box {
+  background: #f0fff5;
+  border: 1px solid #c8f3d7;
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.total-box strong {
+  font-size: 23px;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  border-radius: 12px;
+  padding: 13px 18px;
+  font-size: 14px;
+}
+
+.primary {
+  background: #172033;
+  color: white;
+  width: 100%;
+  margin-top: 16px;
+}
+
+.primary:hover {
+  background: #0e1421;
+}
+
+.search {
+  margin-bottom: 15px;
+}
+
+.order {
+  border: 1px solid #e6e9ef;
+  border-radius: 16px;
+  padding: 17px;
+  margin-bottom: 12px;
+}
+
+.order-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.customer {
+  font-weight: 800;
+  font-size: 17px;
+}
+
+.product {
+  color: #687386;
+  margin-top: 5px;
+  font-size: 14px;
+}
+
+.order-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  gap: 10px;
+}
+
+.amount {
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.status {
+  border-radius: 30px;
+  padding: 7px 11px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #fff3cd;
+  color: #8a6500;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.whatsapp {
+  background: #25d366;
+  color: white;
+}
+
+.delete {
+  background: #fff0f0;
+  color: #d33;
+}
+
+.empty {
+  text-align: center;
+  color: #8a93a3;
+  padding: 35px 10px;
+}
+
+.footer {
+  text-align: center;
+  color: #9aa2b0;
+  font-size: 13px;
+  margin-top: 30px;
+}
+
+@media (max-width: 700px) {
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .field.full {
+    grid-column: auto;
+  }
+
+  .hero h1 {
+    font-size: 25px;
+  }
+
+  .order-details {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">💬</div>
+      WhatsApp Orders
+    </div>
+    <div>🟢</div>
+  </div>
+</header>
+
+<main class="container">
+
+  <section class="hero">
+    <h1>Order Manager</h1>
+    <p>Manage your WhatsApp orders simply and professionally.</p>
+  </section>
+
+  <section class="stats">
+    <div class="stat">
+      <div class="stat-label">Total Orders</div>
+      <div class="stat-value" id="totalOrders">0</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-label">Revenue</div>
+      <div class="stat-value" id="totalRevenue">₹0</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-label">Pending</div>
+      <div class="stat-value" id="pendingOrders">0</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>➕ Add New Order</h2>
+
+    <div class="form-grid">
+
+      <div class="field">
+        <label>Customer Name</label>
+        <input id="customer" type="text" placeholder="e.g. Rahul Sharma">
+      </div>
+
+      <div class="field">
+        <label>WhatsApp Number</label>
+        <input id="phone" type="tel" placeholder="e.g. 9876543210">
+      </div>
+
+      <div class="field">
+        <label>Product</label>
+        <input id="product" type="text" placeholder="e.g. Black T-Shirt">
+      </div>
+
+      <div class="field">
+        <label>Quantity</label>
+        <input id="quantity" type="number" min="1" value="1">
+      </div>
+
+      <div class="field">
+        <label>Price per item (₹)</label>
+        <input id="price" type="number" min="0" placeholder="e.g. 499">
+      </div>
+
+      <div class="field">
+        <label>Status</label>
+        <select id="status">
+          <option>Pending</option>
+          <option>Confirmed</option>
+          <option>Shipped</option>
+          <option>Delivered</option>
+        </select>
+      </div>
+
+      <div class="field full">
+        <label>Delivery Address</label>
+        <input id="address" type="text" placeholder="Customer delivery address">
+      </div>
+
+    </div>
+
+    <div class="total-box">
+      <span>Order Total</span>
+      <strong id="previewTotal">₹0</strong>
+    </div>
+
+    <button class="primary" onclick="addOrder()">
+      Add Order
+    </button>
+  </section>
+
+  <section class="card">
+    <h2>📦 Your Orders</h2>
+
+    <input
+      class="search"
+      id="search"
+      type="text"
+      placeholder="🔎 Search customer or product..."
+      oninput="renderOrders()"
+    >
+
+    <div id="orders"></div>
+  </section>
+
+  <div class="footer">
+    WhatsApp Order Manager • Built for small businesses 🚀
+  </div>
+
+</main>
+
+<script>
+
+let orders = JSON.parse(localStorage.getItem("whatsappOrders")) || [];
+
+const quantityInput = document.getElementById("quantity");
+const priceInput = document.getElementById("price");
+
+quantityInput.addEventListener("input", updatePreview);
+priceInput.addEventListener("input", updatePreview);
+
+function updatePreview() {
+  const quantity = Number(quantityInput.value) || 0;
+  const price = Number(priceInput.value) || 0;
+
+  document.getElementById("previewTotal").textContent =
+    "₹" + (quantity * price).toLocaleString("en-IN");
+}
+
+function saveOrders() {
+  localStorage.setItem("whatsappOrders", JSON.stringify(orders));
+}
+
+function addOrder() {
+
+  const customer = document.getElementById("customer").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const product = document.getElementById("product").value.trim();
+  const quantity = Number(document.getElementById("quantity").value);
+  const price = Number(document.getElementById("price").value);
+  const status = document.getElementById("status").value;
+  const address = document.getElementById("address").value.trim();
+
+  if (!customer || !phone || !product || !quantity || !price) {
+    alert("Please fill in customer, WhatsApp number, product, quantity and price.");
+    return;
+  }
+
+  const order = {
+    id: Date.now(),
+    customer,
+    phone,
+    product,
+    quantity,
+    price,
+    total: quantity * price,
+    status,
+    address,
+    date: new Date().toLocaleString("en-IN")
+  };
+
+  orders.unshift(order);
+
+  saveOrders();
+  renderOrders();
+
+  document.getElementById("customer").value = "";
+  document.getElementById("phone").value = "";
+  document.getElementById("product").value = "";
+  document.getElementById("quantity").value = 1;
+  document.getElementById("price").value = "";
+  document.getElementById("address").value = "";
+
+  updatePreview();
+
+  alert("✅ Order added successfully!");
+}
+
+function renderOrders() {
+
+  const container = document.getElementById("orders");
+  const search = document.getElementById("search").value.toLowerCase();
+
+  const filtered = orders.filter(order =>
+    order.customer.toLowerCase().includes(search) ||
+    order.product.toLowerCase().includes(search)
+  );
+
+  container.innerHTML = "";
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="empty">
+        📦<br><br>
+        No orders yet.<br>
+        Add your first order above.
+      </div>
+    `;
+  }
+
+  filtered.forEach(order => {
+
+    const div = document.createElement("div");
+    div.className = "order";
+
+    div.innerHTML = `
+      <div class="order-top">
+        <div>
+          <div class="customer">${escapeHTML(order.customer)}</div>
+          <div class="product">
+            ${escapeHTML(order.product)}
+            × ${order.quantity}
+          </div>
+        </div>
+
+        <div class="status">${escapeHTML(order.status)}</div>
+      </div>
+
+      <div class="order-details">
+        <div>
+          <div class="amount">₹${order.total.toLocaleString("en-IN")}</div>
+          <small>${order.date}</small>
+        </div>
+      </div>
+
+      <div class="actions">
+
+        <button class="whatsapp"
+          onclick="sendWhatsApp(${order.id})">
+          💬 WhatsApp
+        </button>
+
+        <button class="delete"
+          onclick="deleteOrder(${order.id})">
+          🗑️ Delete
+        </button>
+
+      </div>
+    `;
+
+    container.appendChild(div);
+  });
+
+  updateStats();
+}
+
+function updateStats() {
+
+  const totalOrders = orders.length;
+
+  const revenue = orders.reduce(
+    (sum, order) => sum + order.total,
+    0
+  );
+
+  const pending = orders.filter(
+    order => order.status === "Pending"
+  ).length;
+
+  document.getElementById("totalOrders").textContent = totalOrders;
+
+  document.getElementById("totalRevenue").textContent =
+    "₹" + revenue.toLocaleString("en-IN");
+
+  document.getElementById("pendingOrders").textContent = pending;
+}
+
+function sendWhatsApp(id) {
+
+  const order = orders.find(o => o.id === id);
+
+  if (!order) return;
+
+  let phone = order.phone.replace(/\D/g, "");
+
+  if (phone.length === 10) {
+    phone = "91" + phone;
+  }
+
+  const message =
+`Hello ${order.customer}! 👋
+
+Your order details:
+
+🛍️ Product: ${order.product}
+📦 Quantity: ${order.quantity}
+💰 Total: ₹${order.total.toLocaleString("en-IN")}
+📋 Status: ${order.status}
+
+Thank you for your order! 😊`;
+
+  const url =
+    "https://wa.me/" +
+    phone +
+    "?text=" +
+    encodeURIComponent(message);
+
+  window.open(url, "_blank");
+}
+
+function deleteOrder(id) {
+
+  if (!confirm("Delete this order?")) return;
+
+  orders = orders.filter(order => order.id !== id);
+
+  saveOrders();
+  renderOrders();
+}
+
+function escapeHTML(text) {
+
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+renderOrders();
+updatePreview();
+
+</script>
+
+</body>
+</html>
