@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WhatsApp Order Manager</title>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 * {
   box-sizing: border-box;
@@ -13,52 +15,206 @@
 }
 
 body {
-  font-family: Inter, Arial, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   background: #f5f7fb;
   color: #172033;
   min-height: 100vh;
 }
 
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* HEADER */
+
 header {
-  background: #ffffff;
-  border-bottom: 1px solid #e7eaf0;
+  background: white;
   padding: 18px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   position: sticky;
   top: 0;
   z-index: 10;
 }
 
-.header-inner {
-  max-width: 1100px;
-  margin: auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 20px;
-  font-weight: 800;
+  gap: 12px;
+  font-size: 21px;
+  font-weight: 700;
 }
 
 .logo-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
+  width: 45px;
+  height: 45px;
   background: #25d366;
-  color: white;
-  display: grid;
-  place-items: center;
-  font-size: 22px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 25px;
 }
 
-.container {
-  max-width: 1100px;
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-email {
+  font-size: 13px;
+  color: #667085;
+}
+
+.logout-btn {
+  border: none;
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 9px 13px;
+  border-radius: 9px;
+  font-weight: 600;
+}
+
+/* AUTH */
+
+.auth-screen {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 25px;
+}
+
+.auth-card {
+  background: white;
+  width: 100%;
+  max-width: 430px;
+  border-radius: 22px;
+  padding: 30px;
+  box-shadow: 0 10px 35px rgba(0,0,0,.07);
+}
+
+.auth-logo {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.auth-logo .icon {
+  width: 65px;
+  height: 65px;
+  background: #25d366;
+  border-radius: 20px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 34px;
+  margin-bottom: 12px;
+}
+
+.auth-logo h1 {
+  font-size: 25px;
+  margin-bottom: 6px;
+}
+
+.auth-logo p {
+  color: #667085;
+}
+
+.auth-card h2 {
+  margin-bottom: 18px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 7px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #d9dee8;
+  border-radius: 12px;
+  outline: none;
+  background: white;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #25d366;
+}
+
+.primary-btn {
+  width: 100%;
+  border: none;
+  background: #25d366;
+  color: white;
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 16px;
+  margin-top: 5px;
+}
+
+.primary-btn:hover {
+  background: #1ebe5d;
+}
+
+.switch-auth {
+  text-align: center;
+  margin-top: 18px;
+  color: #667085;
+  font-size: 14px;
+}
+
+.switch-auth button {
+  border: none;
+  background: none;
+  color: #128c7e;
+  font-weight: 700;
+}
+
+.message {
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  font-size: 14px;
+  display: none;
+}
+
+.message.error {
+  display: block;
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.message.success {
+  display: block;
+  background: #dcfce7;
+  color: #166534;
+}
+
+/* DASHBOARD */
+
+.dashboard {
+  max-width: 1150px;
   margin: auto;
-  padding: 28px 18px 80px;
+  padding: 28px 20px 60px;
 }
 
 .hero {
@@ -66,225 +222,201 @@ header {
 }
 
 .hero h1 {
-  font-size: 30px;
-  margin-bottom: 7px;
+  font-size: 34px;
+  margin-bottom: 8px;
 }
 
 .hero p {
-  color: #687386;
+  color: #667085;
+  font-size: 17px;
 }
+
+/* STATS */
 
 .stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
+  gap: 18px;
   margin-bottom: 25px;
 }
 
 .stat {
   background: white;
-  border: 1px solid #e8ebf0;
-  border-radius: 18px;
-  padding: 20px;
-  box-shadow: 0 6px 20px rgba(20,30,50,.04);
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 5px 20px rgba(0,0,0,.04);
 }
 
-.stat-label {
-  color: #7b8494;
-  font-size: 14px;
-  margin-bottom: 8px;
+.stat-title {
+  color: #667085;
+  margin-bottom: 10px;
 }
 
 .stat-value {
-  font-size: 27px;
+  font-size: 30px;
   font-weight: 800;
 }
 
-.card {
+/* ORDER FORM */
+
+.panel {
   background: white;
-  border: 1px solid #e8ebf0;
   border-radius: 20px;
-  padding: 22px;
-  margin-bottom: 22px;
-  box-shadow: 0 6px 20px rgba(20,30,50,.04);
+  padding: 25px;
+  margin-bottom: 25px;
+  box-shadow: 0 5px 20px rgba(0,0,0,.04);
 }
 
-.card h2 {
-  font-size: 20px;
-  margin-bottom: 18px;
+.panel h2 {
+  margin-bottom: 20px;
 }
 
-.form-grid {
+.order-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 15px;
 }
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-
-.field.full {
+.order-grid .full {
   grid-column: 1 / -1;
 }
 
-label {
-  font-size: 13px;
-  font-weight: 700;
-  color: #586174;
-}
-
-input, select {
-  width: 100%;
-  border: 1px solid #dfe4ec;
-  border-radius: 12px;
-  padding: 13px 14px;
-  font-size: 15px;
-  outline: none;
-  background: #fff;
-}
-
-input:focus, select:focus {
-  border-color: #25d366;
-  box-shadow: 0 0 0 3px rgba(37,211,102,.12);
-}
-
-.total-box {
-  background: #f0fff5;
-  border: 1px solid #c8f3d7;
-  border-radius: 14px;
-  padding: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 16px;
-}
-
-.total-box strong {
-  font-size: 23px;
-}
-
-button {
+.add-order-btn {
   border: none;
-  cursor: pointer;
-  font-weight: 700;
-  border-radius: 12px;
-  padding: 13px 18px;
-  font-size: 14px;
-}
-
-.primary {
   background: #172033;
   color: white;
-  width: 100%;
-  margin-top: 16px;
+  padding: 14px 22px;
+  border-radius: 12px;
+  font-weight: 700;
+  margin-top: 5px;
 }
 
-.primary:hover {
-  background: #0e1421;
-}
+/* ORDERS */
 
-.search {
-  margin-bottom: 15px;
-}
-
-.order {
-  border: 1px solid #e6e9ef;
-  border-radius: 16px;
-  padding: 17px;
-  margin-bottom: 12px;
-}
-
-.order-top {
+.order-list {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   gap: 12px;
 }
 
-.customer {
-  font-weight: 800;
-  font-size: 17px;
-}
-
-.product {
-  color: #687386;
-  margin-top: 5px;
-  font-size: 14px;
-}
-
-.order-details {
+.order {
+  border: 1px solid #e5e7eb;
+  border-radius: 15px;
+  padding: 18px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 15px;
-  gap: 10px;
+  gap: 15px;
+}
+
+.order-main h3 {
+  margin-bottom: 6px;
+}
+
+.order-info {
+  color: #667085;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.order-side {
+  text-align: right;
 }
 
 .amount {
+  font-size: 20px;
   font-weight: 800;
-  font-size: 18px;
+  margin-bottom: 8px;
 }
 
 .status {
-  border-radius: 30px;
-  padding: 7px 11px;
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 20px;
+  background: #fff7ed;
+  color: #c2410c;
   font-size: 12px;
   font-weight: 700;
-  background: #fff3cd;
-  color: #8a6500;
 }
 
-.actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 14px;
+.delete-btn {
+  margin-top: 8px;
+  border: none;
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
 }
 
-.whatsapp {
-  background: #25d366;
-  color: white;
-}
-
-.delete {
-  background: #fff0f0;
-  color: #d33;
-}
+/* EMPTY */
 
 .empty {
   text-align: center;
-  color: #8a93a3;
   padding: 35px 10px;
+  color: #667085;
 }
 
-.footer {
+/* LOADING */
+
+.loading {
   text-align: center;
-  color: #9aa2b0;
-  font-size: 13px;
-  margin-top: 30px;
+  padding: 50px;
+  color: #667085;
 }
 
-@media (max-width: 700px) {
+/* MOBILE */
+
+@media(max-width: 700px) {
+
+  header {
+    padding: 14px;
+  }
+
+  .logo {
+    font-size: 17px;
+  }
+
+  .logo-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .user-email {
+    display: none;
+  }
+
+  .dashboard {
+    padding: 22px 14px 50px;
+  }
+
+  .hero h1 {
+    font-size: 28px;
+  }
+
   .stats {
     grid-template-columns: 1fr;
   }
 
-  .form-grid {
+  .order-grid {
     grid-template-columns: 1fr;
   }
 
-  .field.full {
+  .order-grid .full {
     grid-column: auto;
   }
 
-  .hero h1 {
-    font-size: 25px;
+  .order {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
-  .order-details {
-    align-items: flex-start;
-    flex-direction: column;
+  .order-side {
+    text-align: left;
+  }
+
+  .auth-card {
+    padding: 23px;
   }
 }
 </style>
@@ -293,327 +425,867 @@ button {
 <body>
 
 <header>
-  <div class="header-inner">
-    <div class="logo">
-      <div class="logo-icon">💬</div>
-      WhatsApp Orders
-    </div>
-    <div>🟢</div>
+  <div class="logo">
+    <div class="logo-icon">💬</div>
+    WhatsApp Orders
+  </div>
+
+  <div class="header-right">
+    <span id="userEmail" class="user-email"></span>
+    <button id="logoutBtn" class="logout-btn" onclick="logout()" style="display:none;">
+      Logout
+    </button>
   </div>
 </header>
 
-<main class="container">
 
-  <section class="hero">
-    <h1>Order Manager</h1>
-    <p>Manage your WhatsApp orders simply and professionally.</p>
-  </section>
+<!-- AUTH SCREEN -->
 
-  <section class="stats">
-    <div class="stat">
-      <div class="stat-label">Total Orders</div>
-      <div class="stat-value" id="totalOrders">0</div>
+<div id="authScreen" class="auth-screen">
+
+  <div class="auth-card">
+
+    <div class="auth-logo">
+      <div class="icon">💬</div>
+      <h1>WhatsApp Order Manager</h1>
+      <p>Manage your customer orders easily.</p>
     </div>
 
-    <div class="stat">
-      <div class="stat-label">Revenue</div>
-      <div class="stat-value" id="totalRevenue">₹0</div>
-    </div>
+    <div id="message" class="message"></div>
 
-    <div class="stat">
-      <div class="stat-label">Pending</div>
-      <div class="stat-value" id="pendingOrders">0</div>
-    </div>
-  </section>
+    <!-- LOGIN -->
 
-  <section class="card">
-    <h2>➕ Add New Order</h2>
+    <div id="loginBox">
 
-    <div class="form-grid">
+      <h2>Welcome back 👋</h2>
 
-      <div class="field">
-        <label>Customer Name</label>
-        <input id="customer" type="text" placeholder="e.g. Rahul Sharma">
+      <div class="form-group">
+        <label>Email</label>
+        <input
+          id="loginEmail"
+          type="email"
+          placeholder="you@example.com"
+        >
       </div>
 
-      <div class="field">
-        <label>WhatsApp Number</label>
-        <input id="phone" type="tel" placeholder="e.g. 9876543210">
+      <div class="form-group">
+        <label>Password</label>
+        <input
+          id="loginPassword"
+          type="password"
+          placeholder="Your password"
+        >
       </div>
 
-      <div class="field">
-        <label>Product</label>
-        <input id="product" type="text" placeholder="e.g. Black T-Shirt">
-      </div>
+      <button class="primary-btn" onclick="login()">
+        Login
+      </button>
 
-      <div class="field">
-        <label>Quantity</label>
-        <input id="quantity" type="number" min="1" value="1">
-      </div>
-
-      <div class="field">
-        <label>Price per item (₹)</label>
-        <input id="price" type="number" min="0" placeholder="e.g. 499">
-      </div>
-
-      <div class="field">
-        <label>Status</label>
-        <select id="status">
-          <option>Pending</option>
-          <option>Confirmed</option>
-          <option>Shipped</option>
-          <option>Delivered</option>
-        </select>
-      </div>
-
-      <div class="field full">
-        <label>Delivery Address</label>
-        <input id="address" type="text" placeholder="Customer delivery address">
+      <div class="switch-auth">
+        Don't have an account?
+        <button onclick="showSignup()">Create account</button>
       </div>
 
     </div>
 
-    <div class="total-box">
-      <span>Order Total</span>
-      <strong id="previewTotal">₹0</strong>
+
+    <!-- SIGNUP -->
+
+    <div id="signupBox" style="display:none;">
+
+      <h2>Create your account 🚀</h2>
+
+      <div class="form-group">
+        <label>Business name</label>
+        <input
+          id="signupBusiness"
+          type="text"
+          placeholder="My Shop"
+        >
+      </div>
+
+      <div class="form-group">
+        <label>Email</label>
+        <input
+          id="signupEmail"
+          type="email"
+          placeholder="you@example.com"
+        >
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input
+          id="signupPassword"
+          type="password"
+          placeholder="Minimum 6 characters"
+        >
+      </div>
+
+      <button class="primary-btn" onclick="signup()">
+        Create Account
+      </button>
+
+      <div class="switch-auth">
+        Already have an account?
+        <button onclick="showLogin()">Login</button>
+      </div>
+
     </div>
 
-    <button class="primary" onclick="addOrder()">
-      Add Order
-    </button>
-  </section>
-
-  <section class="card">
-    <h2>📦 Your Orders</h2>
-
-    <input
-      class="search"
-      id="search"
-      type="text"
-      placeholder="🔎 Search customer or product..."
-      oninput="renderOrders()"
-    >
-
-    <div id="orders"></div>
-  </section>
-
-  <div class="footer">
-    WhatsApp Order Manager • Built for small businesses 🚀
   </div>
 
-</main>
+</div>
+
+
+<!-- DASHBOARD -->
+
+<div id="dashboard" style="display:none;">
+
+  <main class="dashboard">
+
+    <div class="hero">
+      <h1>Order Manager</h1>
+      <p>Manage your WhatsApp orders simply and professionally.</p>
+    </div>
+
+
+    <!-- STATS -->
+
+    <div class="stats">
+
+      <div class="stat">
+        <div class="stat-title">Total Orders</div>
+        <div id="totalOrders" class="stat-value">0</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-title">Revenue</div>
+        <div id="revenue" class="stat-value">₹0</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-title">Pending</div>
+        <div id="pendingOrders" class="stat-value">0</div>
+      </div>
+
+    </div>
+
+
+    <!-- ADD ORDER -->
+
+    <div class="panel">
+
+      <h2>➕ Add New Order</h2>
+
+      <div id="orderMessage" class="message"></div>
+
+      <div class="order-grid">
+
+        <div class="form-group">
+          <label>Customer Name</label>
+          <input
+            id="customerName"
+            type="text"
+            placeholder="e.g. Rahul Sharma"
+          >
+        </div>
+
+        <div class="form-group">
+          <label>WhatsApp Number</label>
+          <input
+            id="whatsappNumber"
+            type="tel"
+            placeholder="e.g. 9876543210"
+          >
+        </div>
+
+        <div class="form-group">
+          <label>Product Name</label>
+          <input
+            id="productName"
+            type="text"
+            placeholder="e.g. Black T-Shirt"
+          >
+        </div>
+
+        <div class="form-group">
+          <label>Quantity</label>
+          <input
+            id="quantity"
+            type="number"
+            value="1"
+            min="1"
+          >
+        </div>
+
+        <div class="form-group">
+          <label>Amount (₹)</label>
+          <input
+            id="amount"
+            type="number"
+            placeholder="e.g. 599"
+            min="0"
+            step="0.01"
+          >
+        </div>
+
+        <div class="form-group">
+          <label>Status</label>
+
+          <select id="status">
+            <option value="Pending">Pending</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Delivered">Delivered</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+
+        </div>
+
+        <div class="full">
+          <button class="add-order-btn" onclick="addOrder()">
+            + Add Order
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ORDERS -->
+
+    <div class="panel">
+
+      <h2>📦 Your Orders</h2>
+
+      <div id="ordersList" class="order-list">
+        <div class="loading">
+          Loading orders...
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
 
 <script>
 
-let orders = JSON.parse(localStorage.getItem("whatsappOrders")) || [];
+/* =========================================================
+   SUPABASE CONFIGURATION
+   =========================================================
 
-const quantityInput = document.getElementById("quantity");
-const priceInput = document.getElementById("price");
+   REPLACE THESE TWO VALUES.
 
-quantityInput.addEventListener("input", updatePreview);
-priceInput.addEventListener("input", updatePreview);
+   1. SUPABASE_URL
+   2. SUPABASE_ANON_KEY / PUBLISHABLE KEY
 
-function updatePreview() {
-  const quantity = Number(quantityInput.value) || 0;
-  const price = Number(priceInput.value) || 0;
+   ========================================================= */
 
-  document.getElementById("previewTotal").textContent =
-    "₹" + (quantity * price).toLocaleString("en-IN");
+const SUPABASE_URL = "https://xvoajvujmjdwpycbuljl.supabase.co";
+
+const SUPABASE_ANON_KEY = "sb_publishable_kpnu1Cl3lUUarvGYBjdTRg_LPZXnroL";
+
+
+/* Create Supabase client */
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+
+/* =========================================================
+   ELEMENTS
+   ========================================================= */
+
+const authScreen = document.getElementById("authScreen");
+const dashboard = document.getElementById("dashboard");
+const logoutBtn = document.getElementById("logoutBtn");
+const userEmail = document.getElementById("userEmail");
+
+const loginBox = document.getElementById("loginBox");
+const signupBox = document.getElementById("signupBox");
+
+const message = document.getElementById("message");
+const orderMessage = document.getElementById("orderMessage");
+
+
+/* =========================================================
+   MESSAGE
+   ========================================================= */
+
+function showMessage(text, type = "error") {
+
+  message.textContent = text;
+  message.className = "message " + type;
+
 }
 
-function saveOrders() {
-  localStorage.setItem("whatsappOrders", JSON.stringify(orders));
+function showOrderMessage(text, type = "error") {
+
+  orderMessage.textContent = text;
+  orderMessage.className = "message " + type;
+
 }
 
-function addOrder() {
 
-  const customer = document.getElementById("customer").value.trim();
-  const phone = document.getElementById("phone").value.trim();
-  const product = document.getElementById("product").value.trim();
-  const quantity = Number(document.getElementById("quantity").value);
-  const price = Number(document.getElementById("price").value);
-  const status = document.getElementById("status").value;
-  const address = document.getElementById("address").value.trim();
+/* =========================================================
+   LOGIN / SIGNUP SCREEN
+   ========================================================= */
 
-  if (!customer || !phone || !product || !quantity || !price) {
-    alert("Please fill in customer, WhatsApp number, product, quantity and price.");
+function showSignup() {
+
+  loginBox.style.display = "none";
+  signupBox.style.display = "block";
+
+  message.className = "message";
+  message.textContent = "";
+
+}
+
+function showLogin() {
+
+  signupBox.style.display = "none";
+  loginBox.style.display = "block";
+
+  message.className = "message";
+  message.textContent = "";
+
+}
+
+
+/* =========================================================
+   SIGN UP
+   ========================================================= */
+
+async function signup() {
+
+  const business = document.getElementById("signupBusiness").value.trim();
+  const email = document.getElementById("signupEmail").value.trim();
+  const password = document.getElementById("signupPassword").value;
+
+  if (!business || !email || !password) {
+
+    showMessage(
+      "Please fill in all fields."
+    );
+
     return;
   }
 
-  const order = {
-    id: Date.now(),
-    customer,
-    phone,
-    product,
-    quantity,
-    price,
-    total: quantity * price,
-    status,
-    address,
-    date: new Date().toLocaleString("en-IN")
-  };
+  if (password.length < 6) {
 
-  orders.unshift(order);
+    showMessage(
+      "Password must be at least 6 characters."
+    );
 
-  saveOrders();
-  renderOrders();
-
-  document.getElementById("customer").value = "";
-  document.getElementById("phone").value = "";
-  document.getElementById("product").value = "";
-  document.getElementById("quantity").value = 1;
-  document.getElementById("price").value = "";
-  document.getElementById("address").value = "";
-
-  updatePreview();
-
-  alert("✅ Order added successfully!");
-}
-
-function renderOrders() {
-
-  const container = document.getElementById("orders");
-  const search = document.getElementById("search").value.toLowerCase();
-
-  const filtered = orders.filter(order =>
-    order.customer.toLowerCase().includes(search) ||
-    order.product.toLowerCase().includes(search)
-  );
-
-  container.innerHTML = "";
-
-  if (filtered.length === 0) {
-    container.innerHTML = `
-      <div class="empty">
-        📦<br><br>
-        No orders yet.<br>
-        Add your first order above.
-      </div>
-    `;
+    return;
   }
 
-  filtered.forEach(order => {
+  showMessage(
+    "Creating your account...",
+    "success"
+  );
 
-    const div = document.createElement("div");
-    div.className = "order";
+  const { data, error } =
+    await supabaseClient.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: {
+          business_name: business
+        }
+      }
+    });
 
-    div.innerHTML = `
-      <div class="order-top">
-        <div>
-          <div class="customer">${escapeHTML(order.customer)}</div>
-          <div class="product">
-            ${escapeHTML(order.product)}
-            × ${order.quantity}
-          </div>
+  if (error) {
+
+    showMessage(error.message);
+
+    return;
+  }
+
+  showMessage(
+    "Account created! Check your email to confirm your account, then log in.",
+    "success"
+  );
+
+}
+
+
+/* =========================================================
+   LOGIN
+   ========================================================= */
+
+async function login() {
+
+  const email =
+    document.getElementById("loginEmail").value.trim();
+
+  const password =
+    document.getElementById("loginPassword").value;
+
+  if (!email || !password) {
+
+    showMessage(
+      "Please enter your email and password."
+    );
+
+    return;
+  }
+
+  showMessage(
+    "Logging in...",
+    "success"
+  );
+
+  const { data, error } =
+    await supabaseClient.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
+
+  if (error) {
+
+    showMessage(error.message);
+
+    return;
+  }
+
+  showDashboard(data.user);
+
+}
+
+
+/* =========================================================
+   LOGOUT
+   ========================================================= */
+
+async function logout() {
+
+  await supabaseClient.auth.signOut();
+
+  dashboard.style.display = "none";
+  authScreen.style.display = "flex";
+
+  logoutBtn.style.display = "none";
+  userEmail.textContent = "";
+
+  showLogin();
+
+}
+
+
+/* =========================================================
+   SHOW DASHBOARD
+   ========================================================= */
+
+async function showDashboard(user) {
+
+  authScreen.style.display = "none";
+  dashboard.style.display = "block";
+
+  logoutBtn.style.display = "block";
+  userEmail.textContent = user.email;
+
+  await loadOrders();
+
+}
+
+
+/* =========================================================
+   ADD ORDER
+   ========================================================= */
+
+async function addOrder() {
+
+  const {
+    data: {
+      user
+    }
+  } = await supabaseClient.auth.getUser();
+
+  if (!user) {
+
+    showOrderMessage(
+      "You are not logged in."
+    );
+
+    return;
+  }
+
+  const customerName =
+    document.getElementById("customerName").value.trim();
+
+  const whatsappNumber =
+    document.getElementById("whatsappNumber").value.trim();
+
+  const productName =
+    document.getElementById("productName").value.trim();
+
+  const quantity =
+    parseInt(document.getElementById("quantity").value) || 1;
+
+  const amount =
+    parseFloat(document.getElementById("amount").value) || 0;
+
+  const status =
+    document.getElementById("status").value;
+
+
+  if (!customerName) {
+
+    showOrderMessage(
+      "Please enter the customer name."
+    );
+
+    return;
+  }
+
+  if (!productName) {
+
+    showOrderMessage(
+      "Please enter the product name."
+    );
+
+    return;
+  }
+
+
+  const { error } =
+    await supabaseClient
+      .from("orders")
+      .insert({
+
+        user_id: user.id,
+
+        customer_name: customerName,
+
+        whatsapp_number: whatsappNumber,
+
+        product_name: productName,
+
+        quantity: quantity,
+
+        amount: amount,
+
+        status: status
+
+      });
+
+
+  if (error) {
+
+    console.error(error);
+
+    showOrderMessage(
+      error.message
+    );
+
+    return;
+  }
+
+
+  showOrderMessage(
+    "Order added successfully! 🎉",
+    "success"
+  );
+
+
+  /* Clear form */
+
+  document.getElementById("customerName").value = "";
+  document.getElementById("whatsappNumber").value = "";
+  document.getElementById("productName").value = "";
+  document.getElementById("quantity").value = "1";
+  document.getElementById("amount").value = "";
+  document.getElementById("status").value = "Pending";
+
+
+  await loadOrders();
+
+}
+
+
+/* =========================================================
+   LOAD ORDERS
+   ========================================================= */
+
+async function loadOrders() {
+
+  const ordersList =
+    document.getElementById("ordersList");
+
+  ordersList.innerHTML =
+    '<div class="loading">Loading orders...</div>';
+
+
+  const {
+    data: {
+      user
+    }
+  } = await supabaseClient.auth.getUser();
+
+
+  if (!user) {
+
+    return;
+  }
+
+
+  const {
+    data: orders,
+    error
+  } = await supabaseClient
+    .from("orders")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("created_at", {
+      ascending: false
+    });
+
+
+  if (error) {
+
+    console.error(error);
+
+    ordersList.innerHTML =
+      '<div class="empty">Unable to load orders.</div>';
+
+    return;
+  }
+
+
+  updateStats(orders);
+
+
+  if (!orders || orders.length === 0) {
+
+    ordersList.innerHTML =
+      '<div class="empty">📦 No orders yet. Add your first order above.</div>';
+
+    return;
+  }
+
+
+  ordersList.innerHTML = "";
+
+
+  orders.forEach(order => {
+
+    const orderElement =
+      document.createElement("div");
+
+    orderElement.className = "order";
+
+
+    const date =
+      new Date(order.created_at)
+        .toLocaleDateString();
+
+
+    orderElement.innerHTML = `
+
+      <div class="order-main">
+
+        <h3>
+          ${escapeHTML(order.customer_name)}
+        </h3>
+
+        <div class="order-info">
+
+          📱 ${escapeHTML(order.whatsapp_number || "No number")}<br>
+
+          🛍️ ${escapeHTML(order.product_name || "Product")} × ${order.quantity}<br>
+
+          📅 ${date}
+
         </div>
 
-        <div class="status">${escapeHTML(order.status)}</div>
       </div>
 
-      <div class="order-details">
-        <div>
-          <div class="amount">₹${order.total.toLocaleString("en-IN")}</div>
-          <small>${order.date}</small>
+
+      <div class="order-side">
+
+        <div class="amount">
+          ₹${Number(order.amount || 0).toLocaleString("en-IN")}
         </div>
-      </div>
 
-      <div class="actions">
+        <div class="status">
+          ${escapeHTML(order.status)}
+        </div>
 
-        <button class="whatsapp"
-          onclick="sendWhatsApp(${order.id})">
-          💬 WhatsApp
+        <br>
+
+        <button
+          class="delete-btn"
+          onclick="deleteOrder(${order.id})"
+        >
+          Delete
         </button>
 
-        <button class="delete"
-          onclick="deleteOrder(${order.id})">
-          🗑️ Delete
-        </button>
-
       </div>
+
     `;
 
-    container.appendChild(div);
+
+    ordersList.appendChild(orderElement);
+
   });
 
-  updateStats();
 }
 
-function updateStats() {
 
-  const totalOrders = orders.length;
+/* =========================================================
+   UPDATE STATISTICS
+   ========================================================= */
 
-  const revenue = orders.reduce(
-    (sum, order) => sum + order.total,
-    0
-  );
+function updateStats(orders) {
 
-  const pending = orders.filter(
-    order => order.status === "Pending"
-  ).length;
+  const total =
+    orders.length;
 
-  document.getElementById("totalOrders").textContent = totalOrders;
 
-  document.getElementById("totalRevenue").textContent =
-    "₹" + revenue.toLocaleString("en-IN");
+  const revenue =
+    orders
+      .filter(order => order.status !== "Cancelled")
+      .reduce(
+        (sum, order) =>
+          sum + Number(order.amount || 0),
+        0
+      );
 
-  document.getElementById("pendingOrders").textContent = pending;
+
+  const pending =
+    orders.filter(
+      order => order.status === "Pending"
+    ).length;
+
+
+  document.getElementById("totalOrders")
+    .textContent = total;
+
+
+  document.getElementById("revenue")
+    .textContent =
+      "₹" +
+      revenue.toLocaleString("en-IN");
+
+
+  document.getElementById("pendingOrders")
+    .textContent = pending;
+
 }
 
-function sendWhatsApp(id) {
 
-  const order = orders.find(o => o.id === id);
+/* =========================================================
+   DELETE ORDER
+   ========================================================= */
 
-  if (!order) return;
+async function deleteOrder(id) {
 
-  let phone = order.phone.replace(/\D/g, "");
+  const confirmed =
+    confirm("Delete this order?");
 
-  if (phone.length === 10) {
-    phone = "91" + phone;
+  if (!confirmed) {
+    return;
   }
 
-  const message =
-`Hello ${order.customer}! 👋
 
-Your order details:
+  const { error } =
+    await supabaseClient
+      .from("orders")
+      .delete()
+      .eq("id", id);
 
-🛍️ Product: ${order.product}
-📦 Quantity: ${order.quantity}
-💰 Total: ₹${order.total.toLocaleString("en-IN")}
-📋 Status: ${order.status}
 
-Thank you for your order! 😊`;
+  if (error) {
 
-  const url =
-    "https://wa.me/" +
-    phone +
-    "?text=" +
-    encodeURIComponent(message);
+    alert(error.message);
 
-  window.open(url, "_blank");
+    return;
+  }
+
+
+  await loadOrders();
+
 }
 
-function deleteOrder(id) {
 
-  if (!confirm("Delete this order?")) return;
+/* =========================================================
+   BASIC HTML SECURITY
+   ========================================================= */
 
-  orders = orders.filter(order => order.id !== id);
+function escapeHTML(value) {
 
-  saveOrders();
-  renderOrders();
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+
 }
 
-function escapeHTML(text) {
 
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+/* =========================================================
+   CHECK CURRENT LOGIN
+   ========================================================= */
+
+async function checkSession() {
+
+  const {
+    data: {
+      session
+    }
+  } = await supabaseClient.auth.getSession();
+
+
+  if (session && session.user) {
+
+    showDashboard(session.user);
+
+  } else {
+
+    authScreen.style.display = "flex";
+    dashboard.style.display = "none";
+
+  }
+
 }
 
-renderOrders();
-updatePreview();
+
+/* =========================================================
+   AUTH STATE LISTENER
+   ========================================================= */
+
+supabaseClient.auth.onAuthStateChange(
+  async (event, session) => {
+
+    if (session && session.user) {
+
+      showDashboard(session.user);
+
+    } else {
+
+      dashboard.style.display = "none";
+      authScreen.style.display = "flex";
+
+      logoutBtn.style.display = "none";
+
+    }
+
+  }
+);
+
+
+/* START */
+
+checkSession();
 
 </script>
 
