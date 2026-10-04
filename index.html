@@ -388,6 +388,23 @@ header {
 .whatsapp-btn:hover {
   background: #1ebe5d;
 }
+
+  /* EDIT BUTTON */
+
+.edit-btn {
+  margin-top: 8px;
+  border: none;
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.edit-btn:hover {
+  background: #bae6fd;
+}
   
 /* EMPTY */
 
@@ -1195,6 +1212,13 @@ async function loadOrders() {
 </button>
 
 <button
+  class="edit-btn"
+  onclick="editOrder(${order.id})"
+>
+  ✏️ Edit
+</button>
+
+<button
   class="delete-btn"
   onclick="deleteOrder(${order.id})"
 >
@@ -1417,7 +1441,115 @@ function updateStats(orders) {
 
 }
 
+/* =========================================================
+   EDIT ORDER
+   ========================================================= */
 
+async function editOrder(id) {
+
+  const { data: order, error } =
+    await supabaseClient
+      .from("orders")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+  if (error) {
+
+    alert(error.message);
+    return;
+
+  }
+
+  const customerName =
+    prompt(
+      "Customer Name:",
+      order.customer_name || ""
+    );
+
+  if (customerName === null) return;
+
+
+  const whatsappNumber =
+    prompt(
+      "WhatsApp Number:",
+      order.whatsapp_number || ""
+    );
+
+  if (whatsappNumber === null) return;
+
+
+  const productName =
+    prompt(
+      "Product Name:",
+      order.product_name || ""
+    );
+
+  if (productName === null) return;
+
+
+  const quantity =
+    prompt(
+      "Quantity:",
+      order.quantity || 1
+    );
+
+  if (quantity === null) return;
+
+
+  const amount =
+    prompt(
+      "Amount (₹):",
+      order.amount || 0
+    );
+
+  if (amount === null) return;
+
+
+  const status =
+    prompt(
+      "Status: Pending / Confirmed / Delivered / Cancelled",
+      order.status || "Pending"
+    );
+
+  if (status === null) return;
+
+
+  const { error: updateError } =
+    await supabaseClient
+      .from("orders")
+      .update({
+
+        customer_name: customerName.trim(),
+
+        whatsapp_number: whatsappNumber.trim(),
+
+        product_name: productName.trim(),
+
+        quantity: parseInt(quantity) || 1,
+
+        amount: parseFloat(amount) || 0,
+
+        status: status.trim()
+
+      })
+      .eq("id", id);
+
+
+  if (updateError) {
+
+    alert(updateError.message);
+    return;
+
+  }
+
+
+  alert("Order updated successfully! 🎉");
+
+  await loadOrders();
+
+}
+  
 /* =========================================================
    DELETE ORDER
    ========================================================= */
