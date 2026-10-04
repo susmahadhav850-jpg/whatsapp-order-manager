@@ -348,7 +348,23 @@ header {
   border-radius: 8px;
   font-size: 12px;
 }
+/* WHATSAPP BUTTON */
 
+.whatsapp-btn {
+  margin-top: 8px;
+  border: none;
+  background: #25d366;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.whatsapp-btn:hover {
+  background: #1ebe5d;
+}
+  
 /* EMPTY */
 
 .empty {
@@ -1115,31 +1131,112 @@ async function loadOrders() {
           ₹${Number(order.amount || 0).toLocaleString("en-IN")}
         </div>
 
-        <div class="status">
-          ${escapeHTML(order.status)}
-        </div>
+         <div class="status">
+  ${escapeHTML(order.status)}
+</div>
 
-        <br>
+<br>
 
-        <button
-          class="delete-btn"
-          onclick="deleteOrder(${order.id})"
-        >
-          Delete
-        </button>
+<button
+  class="whatsapp-btn"
+  type="button"
+>
+  📲 WhatsApp
+</button>
+
+<button
+  class="delete-btn"
+  onclick="deleteOrder(${order.id})"
+>
+  Delete
+</button>
 
       </div>
 
     `;
 
 
-    ordersList.appendChild(orderElement);
+    const whatsappButton =
+  orderElement.querySelector(".whatsapp-btn");
+
+whatsappButton.addEventListener("click", () => {
+  openWhatsApp(order);
+});
+
+ordersList.appendChild(orderElement);
 
   });
 
 }
 
+/* =========================================================
+   WHATSAPP MESSAGE
+   ========================================================= */
 
+function openWhatsApp(order) {
+
+  let phone = String(order.whatsapp_number || "")
+    .replace(/\D/g, "");
+
+  if (!phone) {
+
+    alert("This order does not have a WhatsApp number.");
+
+    return;
+  }
+
+
+  /* Automatically add India country code */
+
+  if (phone.length === 10) {
+    phone = "91" + phone;
+  }
+
+
+  const customerName =
+    order.customer_name || "Customer";
+
+  const productName =
+    order.product_name || "Product";
+
+  const quantity =
+    order.quantity || 1;
+
+  const amount =
+    Number(order.amount || 0)
+      .toLocaleString("en-IN");
+
+  const status =
+    order.status || "Pending";
+
+
+  const message =
+`👋 Hello ${customerName}!
+
+Thank you for your order. 😊
+
+📦 Product: ${productName}
+🔢 Quantity: ${quantity}
+💰 Amount: ₹${amount}
+📋 Status: ${status}
+
+Thank you for shopping with us! 🙏`;
+
+
+  const whatsappURL =
+    "https://wa.me/" +
+    phone +
+    "?text=" +
+    encodeURIComponent(message);
+
+
+  window.open(
+    whatsappURL,
+    "_blank"
+  );
+
+}
+  
 /* =========================================================
    UPDATE STATISTICS
    ========================================================= */
