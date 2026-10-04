@@ -1218,7 +1218,97 @@ ordersList.appendChild(orderElement);
   });
 
 }
+  
+/* =========================================================
+   FILTER ORDERS
+   ========================================================= */
 
+function filterOrders() {
+
+  const search =
+    document.getElementById("searchOrders")
+      .value
+      .toLowerCase()
+      .trim();
+
+  const statusFilter =
+    document.getElementById("filterStatus")
+      .value;
+
+  const orders =
+    document.querySelectorAll(".order");
+
+  let visibleCount = 0;
+
+  orders.forEach(order => {
+
+    const text =
+      order.textContent.toLowerCase();
+
+    const matchesSearch =
+      text.includes(search);
+
+    const statusElement =
+      order.querySelector(".status");
+
+    const orderStatus =
+      statusElement
+        ? statusElement.textContent.trim()
+        : "";
+
+    const matchesStatus =
+      statusFilter === "All" ||
+      orderStatus === statusFilter;
+
+    if (matchesSearch && matchesStatus) {
+
+      order.style.display = "flex";
+      visibleCount++;
+
+    } else {
+
+      order.style.display = "none";
+
+    }
+
+  });
+
+  const ordersList =
+    document.getElementById("ordersList");
+
+  let noResults =
+    document.getElementById("noFilterResults");
+
+  if (visibleCount === 0 && orders.length > 0) {
+
+    if (!noResults) {
+
+      noResults =
+        document.createElement("div");
+
+      noResults.id =
+        "noFilterResults";
+
+      noResults.className =
+        "empty";
+
+      noResults.textContent =
+        "🔎 No matching orders found.";
+
+      ordersList.appendChild(noResults);
+
+    }
+
+  } else {
+
+    if (noResults) {
+      noResults.remove();
+    }
+
+  }
+
+}
+  
 /* =========================================================
    WHATSAPP MESSAGE
    ========================================================= */
