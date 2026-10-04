@@ -291,6 +291,30 @@ header {
   margin-top: 5px;
 }
 
+  /* ORDER FILTERS */
+
+.order-filters {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.order-filters input,
+.order-filters select {
+  width: 100%;
+  padding: 13px 15px;
+  border: 1px solid #d9dee8;
+  border-radius: 12px;
+  outline: none;
+  background: white;
+}
+
+.order-filters input:focus,
+.order-filters select:focus {
+  border-color: #25d366;
+}
+  
 /* ORDERS */
 
 .order-list {
@@ -418,6 +442,10 @@ header {
     grid-template-columns: 1fr;
   }
 
+  .order-filters {
+  grid-template-columns: 1fr;
+}
+  
   .order-grid .full {
     grid-column: auto;
   }
@@ -673,15 +701,37 @@ header {
 
     <div class="panel">
 
-      <h2>📦 Your Orders</h2>
+  <h2>📦 Your Orders</h2>
 
-      <div id="ordersList" class="order-list">
-        <div class="loading">
-          Loading orders...
-        </div>
-      </div>
+  <div class="order-filters">
 
+    <input
+      id="searchOrders"
+      type="text"
+      placeholder="🔎 Search customer, product or WhatsApp number..."
+      oninput="filterOrders()"
+    >
+
+    <select
+      id="filterStatus"
+      onchange="filterOrders()"
+    >
+      <option value="All">All Status</option>
+      <option value="Pending">Pending</option>
+      <option value="Confirmed">Confirmed</option>
+      <option value="Delivered">Delivered</option>
+      <option value="Cancelled">Cancelled</option>
+    </select>
+
+  </div>
+
+  <div id="ordersList" class="order-list">
+    <div class="loading">
+      Loading orders...
     </div>
+  </div>
+
+</div>
 
   </main>
 
