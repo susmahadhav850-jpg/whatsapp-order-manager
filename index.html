@@ -1668,6 +1668,15 @@ function updateStats(orders) {
    EDIT ORDER
    ========================================================= */
 
+/* =========================================================
+   EDIT ORDER MODAL
+   ========================================================= */
+
+let editingOrderId = null;
+
+
+/* OPEN EDIT MODAL */
+
 async function editOrder(id) {
 
   const { data: order, error } =
@@ -1684,90 +1693,181 @@ async function editOrder(id) {
 
   }
 
-  const customerName =
-    prompt(
-      "Customer Name:",
-      order.customer_name || ""
-    );
-
-  if (customerName === null) return;
+  editingOrderId = id;
 
 
-  const whatsappNumber =
-    prompt(
-      "WhatsApp Number:",
-      order.whatsapp_number || ""
-    );
+  /* Fill form */
 
-  if (whatsappNumber === null) return;
+  document.getElementById("editCustomerName").value =
+    order.customer_name || "";
 
+  document.getElementById("editWhatsappNumber").value =
+    order.whatsapp_number || "";
 
-  const productName =
-    prompt(
-      "Product Name:",
-      order.product_name || ""
-    );
+  document.getElementById("editProductName").value =
+    order.product_name || "";
 
-  if (productName === null) return;
+  document.getElementById("editQuantity").value =
+    order.quantity || 1;
 
+  document.getElementById("editAmount").value =
+    order.amount || 0;
 
-  const quantity =
-    prompt(
-      "Quantity:",
-      order.quantity || 1
-    );
-
-  if (quantity === null) return;
+  document.getElementById("editStatus").value =
+    order.status || "Pending";
 
 
-  const amount =
-    prompt(
-      "Amount (₹):",
-      order.amount || 0
-    );
+  /* Show modal */
 
-  if (amount === null) return;
+  document
+    .getElementById("editModal")
+    .classList.add("show");
 
-
-  const status =
-    prompt(
-      "Status: Pending / Confirmed / Delivered / Cancelled",
-      order.status || "Pending"
-    );
-
-  if (status === null) return;
+}
 
 
-  const { error: updateError } =
-    await supabaseClient
-      .from("orders")
-      .update({
+/* CLOSE EDIT MODAL */
 
-        customer_name: customerName.trim(),
+function closeEditModal() {
 
-        whatsapp_number: whatsappNumber.trim(),
+  document
+    .getElementById("editModal")
+    .classList.remove("show");
 
-        product_name: productName.trim(),
+  editingOrderId = null;
 
-        quantity: parseInt(quantity) || 1,
-
-        amount: parseFloat(amount) || 0,
-
-        status: status.trim()
-
-      })
-      .eq("id", id);
+}
 
 
-  if (updateError) {
+/* SAVE EDITED ORDER */
 
-    alert(updateError.message);
+async function saveEditedOrder() {
+
+  if (!editingOrderId) {
+
+    alert("No order selected.");
+
     return;
 
   }
 
 
-  alert("Order updated successfully! 🎉");
+  const customerName =
+    document
+      .getElementById("editCustomerName")
+      .value
+      .trim();
+
+  const whatsappNumber =
+    document
+      .getElementById("editWhatsappNumber")
+      .value
+      .trim();
+
+  const productName =
+    document
+      .getElementById("editProductName")
+      .value
+      .trim();
+
+  const quantity =
+    parseInt(
+      document
+        .getElementById("editQuantity")
+        .value
+    ) || 1;
+
+  const amount =
+    parseFloat(
+      document
+        .getElementById("editAmount")
+        .value
+    ) || 0;
+
+  const status =
+    document
+      .getElementById("editStatus")
+      .value;
+
+
+  /* Validation */
+
+  if (!customerName) {
+
+    alert("Please enter the customer name.");
+
+    return;
+
+  }
+
+
+  if (!productName) {
+
+    alert("Please enter the product name.");
+
+    return;
+
+  }
+
+
+  if (quantity < 1) {
+
+    alert("Quantity must be at least 1.");
+
+    return;
+
+  }
+
+
+  if (amount < 0) {
+
+    alert("Amount cannot be negative.");
+
+    return;
+
+  }
+
+
+  /* Update Supabase */
+
+  const { error } =
+    await supabaseClient
+      .from("orders")
+      .update({
+
+        customer_name: customerName,
+
+        whatsapp_number: whatsappNumber,
+
+        product_name: productName,
+
+        quantity: quantity,
+
+        amount: amount,
+
+        status: status
+
+      })
+      .eq("id", editingOrderId);
+
+
+  if (error) {
+
+    console.error(error);
+
+    alert(error.message);
+
+    return;
+
+  }
+
+
+  /* Close popup */
+
+  closeEditModal();
+
+
+  /* Refresh orders */
 
   await loadOrders();
 
