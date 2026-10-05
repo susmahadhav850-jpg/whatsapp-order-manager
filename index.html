@@ -405,6 +405,126 @@ header {
 .edit-btn:hover {
   background: #bae6fd;
 }
+
+ /* EDIT ORDER MODAL */
+
+.edit-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.edit-modal.show {
+  display: flex;
+}
+
+.edit-modal-content {
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: white;
+  border-radius: 22px;
+  padding: 25px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.20);
+}
+
+.edit-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+}
+
+.edit-modal-header h2 {
+  margin: 0;
+}
+
+.close-edit-btn {
+  border: none;
+  background: #f1f5f9;
+  color: #172033;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  font-size: 25px;
+  line-height: 1;
+}
+
+.close-edit-btn:hover {
+  background: #e2e8f0;
+}
+
+.edit-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.edit-form .form-group {
+  margin-bottom: 0;
+}
+
+.edit-modal-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.cancel-edit-btn {
+  border: none;
+  background: #f1f5f9;
+  color: #334155;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.cancel-edit-btn:hover {
+  background: #e2e8f0;
+}
+
+.save-edit-btn {
+  border: none;
+  background: #25d366;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.save-edit-btn:hover {
+  background: #1ebe5d;
+}
+
+@media(max-width: 700px) {
+
+  .edit-modal-content {
+    padding: 20px;
+  }
+
+  .edit-form {
+    grid-template-columns: 1fr;
+  }
+
+  .edit-modal-actions {
+    grid-column: auto;
+    flex-direction: column;
+  }
+
+  .cancel-edit-btn,
+  .save-edit-btn {
+    width: 100%;
+  }
+
+}
   
 /* EMPTY */
 
@@ -754,7 +874,110 @@ header {
 
 </div>
 
+<!-- EDIT ORDER MODAL -->
 
+<div id="editModal" class="edit-modal">
+
+  <div class="edit-modal-content">
+
+    <div class="edit-modal-header">
+      <h2>✏️ Edit Order</h2>
+
+      <button
+        type="button"
+        class="close-edit-btn"
+        onclick="closeEditModal()"
+      >
+        ×
+      </button>
+    </div>
+
+    <div class="edit-form">
+
+      <div class="form-group">
+        <label>Customer Name</label>
+        <input
+          id="editCustomerName"
+          type="text"
+          placeholder="Customer name"
+        >
+      </div>
+
+      <div class="form-group">
+        <label>WhatsApp Number</label>
+        <input
+          id="editWhatsappNumber"
+          type="tel"
+          placeholder="WhatsApp number"
+        >
+      </div>
+
+      <div class="form-group">
+        <label>Product Name</label>
+        <input
+          id="editProductName"
+          type="text"
+          placeholder="Product name"
+        >
+      </div>
+
+      <div class="form-group">
+        <label>Quantity</label>
+        <input
+          id="editQuantity"
+          type="number"
+          min="1"
+        >
+      </div>
+
+      <div class="form-group">
+        <label>Amount (₹)</label>
+        <input
+          id="editAmount"
+          type="number"
+          min="0"
+          step="0.01"
+        >
+      </div>
+
+      <div class="form-group">
+        <label>Status</label>
+
+        <select id="editStatus">
+          <option value="Pending">Pending</option>
+          <option value="Confirmed">Confirmed</option>
+          <option value="Delivered">Delivered</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+
+      </div>
+
+      <div class="edit-modal-actions">
+
+        <button
+          type="button"
+          class="cancel-edit-btn"
+          onclick="closeEditModal()"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          class="save-edit-btn"
+          onclick="saveEditedOrder()"
+        >
+          💾 Save Changes
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+  
 <script>
 
 /* =========================================================
