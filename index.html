@@ -2582,9 +2582,17 @@ async function openCustomerProfile(customerKey) {
   profileContent.innerHTML =
     '<div class="loading">Loading customer...</div>';
 
-  customerModal.classList.add("show");
+ customerModal.classList.add("show");
+customerModal.style.display = "flex";
+document.body.style.overflow = "hidden";
 
-
+/* Add browser history entry for Customer Profile */
+history.pushState(
+  { customerProfile: true },
+  "",
+  "#customer-profile"
+);
+  
   const {
     data: {
       user
@@ -2812,15 +2820,94 @@ async function openCustomerProfile(customerKey) {
 
 }
 
-  /* CLOSE CUSTOMER PROFILE */
+/* =========================================================
+   CLOSE CUSTOMER PROFILE
+   ========================================================= */
 
 function closeCustomerProfile() {
 
-  document
-    .getElementById("customerModal")
-    .classList.remove("show");
+  const customerModal =
+    document.getElementById("customerModal");
+
+  if (!customerModal) return;
+
+  customerModal.classList.remove("show");
+
+  /* Restore page scrolling */
+  document.body.style.overflow = "";
+
+  /* Remove the browser history entry */
+  if (history.state && history.state.customerProfile) {
+    history.back();
+  }
 
 }
+
+
+/* =========================================================
+   ANDROID / BROWSER BACK BUTTON
+   ========================================================= */
+
+window.addEventListener("popstate", function(event) {
+
+  const customerModal =
+    document.getElementById("customerModal");
+
+  if (!customerModal) return;
+
+  if (customerModal.classList.contains("show")) {
+
+    customerModal.classList.remove("show");
+
+    /* Restore page scrolling */
+    document.body.style.overflow = "";
+
+  }
+
+});
+
+/* =========================================================
+   CUSTOMER PROFILE CLOSE BUTTON
+   ========================================================= */
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const closeButton =
+    document.querySelector(".close-customer-btn");
+
+  const customerModal =
+    document.getElementById("customerModal");
+
+  if (closeButton) {
+
+    closeButton.addEventListener("click", function(event) {
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      closeCustomerProfile();
+
+    });
+
+  }
+
+  /* Close when clicking outside the profile */
+
+  if (customerModal) {
+
+    customerModal.addEventListener("click", function(event) {
+
+      if (event.target === customerModal) {
+
+        closeCustomerProfile();
+
+      }
+
+    });
+
+  }
+
+});
   
 /* =========================================================
    CUSTOMER WHATSAPP
