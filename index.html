@@ -1857,12 +1857,12 @@ function filterOrders() {
       text.includes(search);
 
     const statusElement =
-      order.querySelector(".status");
+  order.querySelector(".status-select");
 
-    const orderStatus =
-      statusElement
-        ? statusElement.textContent.trim()
-        : "";
+const orderStatus =
+  statusElement
+    ? statusElement.value
+    : "";
 
     const matchesStatus =
       statusFilter === "All" ||
