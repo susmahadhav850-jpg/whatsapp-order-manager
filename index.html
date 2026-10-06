@@ -707,6 +707,145 @@ header {
     padding: 23px;
   }
 }
+
+  /* =========================================================
+   CUSTOMER PROFILE MODAL
+   ========================================================= */
+
+.customer-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  z-index: 2000;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.customer-modal.show {
+  display: flex;
+}
+
+.customer-modal-content {
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: white;
+  border-radius: 22px;
+  padding: 25px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.2);
+}
+
+.customer-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.customer-modal-header h2 {
+  margin: 0;
+}
+
+.close-customer-btn {
+  border: none;
+  background: #f1f5f9;
+  color: #172033;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  font-size: 25px;
+}
+
+.customer-profile-card {
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 20px;
+}
+
+.customer-profile-card h3 {
+  margin-bottom: 10px;
+  font-size: 22px;
+}
+
+.customer-profile-info {
+  color: #667085;
+  line-height: 1.8;
+  font-size: 14px;
+}
+
+.customer-profile-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.customer-profile-stat {
+  background: #f8fafc;
+  padding: 15px;
+  border-radius: 14px;
+}
+
+.customer-profile-stat-title {
+  font-size: 12px;
+  color: #667085;
+  margin-bottom: 5px;
+}
+
+.customer-profile-stat-value {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.customer-orders-title {
+  margin-bottom: 12px;
+}
+
+.customer-order-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 10px;
+}
+
+.customer-order-item strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.customer-order-info {
+  color: #667085;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.customer-status {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 5px 9px;
+  border-radius: 20px;
+  background: #fff7ed;
+  color: #c2410c;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+@media(max-width: 700px) {
+
+  .customer-modal-content {
+    padding: 20px;
+  }
+
+  .customer-profile-stats {
+    grid-template-columns: 1fr;
+  }
+
+}
+  
   /* STATUS DROPDOWN */
 
 .status-select {
@@ -1141,6 +1280,38 @@ header {
           💾 Save Changes
         </button>
 
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+  <!-- CUSTOMER PROFILE MODAL -->
+
+<div id="customerModal" class="customer-modal">
+
+  <div class="customer-modal-content">
+
+    <div class="customer-modal-header">
+
+      <h2>👤 Customer Profile</h2>
+
+      <button
+        type="button"
+        class="close-customer-btn"
+        onclick="closeCustomerProfile()"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <div id="customerProfileContent">
+
+      <div class="loading">
+        Loading customer...
       </div>
 
     </div>
@@ -2267,9 +2438,13 @@ function renderCustomers(customers) {
 
       <div class="customer-main">
 
-        <h3>
-          ${escapeHTML(customer.name)}
-        </h3>
+        <h3
+  onclick="openCustomerProfile('${escapeHTML(customer.phone || customer.name)}')"
+  style="cursor:pointer; color:#128c7e;"
+  title="Open customer profile"
+>
+  ${escapeHTML(customer.name)}
+</h3>
 
         <div class="customer-phone">
 
@@ -2394,15 +2569,258 @@ function filterCustomers() {
 
 }
 
+/* OPEN CUSTOMER PROFILE */
 
-/* CUSTOMER WHATSAPP */
+async function openCustomerProfile(customerKey) {
+
+  const customerModal =
+    document.getElementById("customerModal");
+
+  const profileContent =
+    document.getElementById("customerProfileContent");
+
+  profileContent.innerHTML =
+    '<div class="loading">Loading customer...</div>';
+
+  customerModal.classList.add("show");
+
+
+  const {
+    data: {
+      user
+    }
+  } = await supabaseClient.auth.getUser();
+
+
+  if (!user) {
+
+    profileContent.innerHTML =
+      '<div class="empty">You are not logged in.</div>';
+
+    return;
+  }
+
+
+  /* Load this customer's orders */
+
+  const {
+    data: orders,
+    error
+  } = await supabaseClient
+    .from("orders")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("created_at", {
+      ascending: false
+    });
+
+
+  if (error) {
+
+    console.error(error);
+
+    profileContent.innerHTML =
+      '<div class="empty">Unable to load customer profile.</div>';
+
+    return;
+  }
+
+
+  /* Find matching customer */
+
+  const cleanKey =
+    String(customerKey || "")
+      .replace(/\D/g, "");
+
+
+  const customerOrders =
+    orders.filter(order => {
+
+      const phone =
+        String(order.whatsapp_number || "")
+          .replace(/\D/g, "");
+
+      const name =
+        String(order.customer_name || "")
+          .toLowerCase()
+          .trim();
+
+      return (
+        (cleanKey && phone === cleanKey) ||
+        (!cleanKey &&
+          name === String(customerKey).toLowerCase().trim())
+      );
+
+    });
+
+
+  if (!customerOrders.length) {
+
+    profileContent.innerHTML =
+      '<div class="empty">No orders found for this customer.</div>';
+
+    return;
+  }
+
+
+  const customer =
+    customerOrders[0];
+
+
+  const customerName =
+    customer.customer_name || "Unknown Customer";
+
+
+  const customerPhone =
+    customer.whatsapp_number || "";
+
+
+  const totalOrders =
+    customerOrders.length;
+
+
+  const totalSpent =
+    customerOrders
+      .filter(order => order.status !== "Cancelled")
+      .reduce(
+        (sum, order) =>
+          sum + Number(order.amount || 0),
+        0
+      );
+
+
+  const lastOrder =
+    customerOrders[0].created_at
+      ? new Date(customerOrders[0].created_at)
+          .toLocaleDateString("en-IN")
+      : "-";
+
+
+  profileContent.innerHTML = `
+
+    <div class="customer-profile-card">
+
+      <h3>
+        👤 ${escapeHTML(customerName)}
+      </h3>
+
+      <div class="customer-profile-info">
+
+        📱 ${
+          escapeHTML(
+            customerPhone || "No WhatsApp number"
+          )
+        }
+
+      </div>
+
+    </div>
+
+
+    <div class="customer-profile-stats">
+
+      <div class="customer-profile-stat">
+
+        <div class="customer-profile-stat-title">
+          Total Orders
+        </div>
+
+        <div class="customer-profile-stat-value">
+          ${totalOrders}
+        </div>
+
+      </div>
+
+
+      <div class="customer-profile-stat">
+
+        <div class="customer-profile-stat-title">
+          Total Spent
+        </div>
+
+        <div class="customer-profile-stat-value">
+          ₹${totalSpent.toLocaleString("en-IN")}
+        </div>
+
+      </div>
+
+
+      <div class="customer-profile-stat">
+
+        <div class="customer-profile-stat-title">
+          Last Order
+        </div>
+
+        <div class="customer-profile-stat-value">
+          ${lastOrder}
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <h3 class="customer-orders-title">
+      📦 Order History
+    </h3>
+
+
+    <div>
+
+      ${customerOrders.map(order => `
+
+        <div class="customer-order-item">
+
+          <strong>
+            ${escapeHTML(
+              order.product_name || "Product"
+            )}
+          </strong>
+
+          <div class="customer-order-info">
+
+            Quantity: ${order.quantity || 1}<br>
+
+            Amount:
+            ₹${Number(
+              order.amount || 0
+            ).toLocaleString("en-IN")}<br>
+
+            Date:
+            ${
+              order.created_at
+                ? new Date(order.created_at)
+                    .toLocaleDateString("en-IN")
+                : "-"
+            }
+
+          </div>
+
+          <span class="customer-status">
+            ${escapeHTML(
+              order.status || "Pending"
+            )}
+          </span>
+
+        </div>
+
+      `).join("")}
+
+    </div>
+
+  `;
+
+}
+
+/* =========================================================
+   CUSTOMER WHATSAPP
+   ========================================================= */
 
 function openCustomerWhatsApp(customer) {
 
   let phone =
     String(customer.phone || "")
       .replace(/\D/g, "");
-
 
   if (!phone) {
 
@@ -2411,9 +2829,7 @@ function openCustomerWhatsApp(customer) {
     );
 
     return;
-
   }
-
 
   /*
     Automatically add India country code
@@ -2421,11 +2837,8 @@ function openCustomerWhatsApp(customer) {
   */
 
   if (phone.length === 10) {
-
     phone = "91" + phone;
-
   }
-
 
   const message =
 `Hello ${customer.name}!
@@ -2438,13 +2851,11 @@ You have placed ${customer.totalOrders} order${
 
 Thank you for your continued support!`;
 
-
   const whatsappURL =
     "https://wa.me/" +
     phone +
     "?text=" +
     encodeURIComponent(message);
-
 
   window.open(
     whatsappURL,
