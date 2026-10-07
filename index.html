@@ -882,6 +882,208 @@ header {
   background: #fee2e2;
   color: #b91c1c;
 }
+
+  /* =========================================================
+   UPGRADE / SUBSCRIPTION MODAL
+   ========================================================= */
+
+.upgrade-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  z-index: 5000;
+  justify-content: center;
+  align-items: center;
+  padding: 18px;
+  overflow-y: auto;
+}
+
+.upgrade-modal.show {
+  display: flex;
+}
+
+.upgrade-modal-content {
+  width: 100%;
+  max-width: 900px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: white;
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: 0 25px 80px rgba(0,0,0,.25);
+}
+
+.upgrade-header {
+  text-align: center;
+  margin-bottom: 25px;
+  position: relative;
+}
+
+.upgrade-header h2 {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.upgrade-header p {
+  color: #667085;
+  font-size: 15px;
+}
+
+.close-upgrade-btn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  border: none;
+  background: #f1f5f9;
+  color: #172033;
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.close-upgrade-btn:hover {
+  background: #e2e8f0;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.pricing-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 20px;
+  background: white;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.pricing-card.featured {
+  border: 2px solid #25d366;
+  box-shadow: 0 8px 30px rgba(37, 211, 102, .15);
+}
+
+.popular-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #25d366;
+  color: white;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.plan-icon {
+  font-size: 30px;
+  margin-bottom: 10px;
+}
+
+.plan-name {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.plan-price {
+  font-size: 27px;
+  font-weight: 900;
+  margin-bottom: 3px;
+}
+
+.plan-period {
+  color: #667085;
+  font-size: 12px;
+  margin-bottom: 18px;
+}
+
+.plan-orders {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.plan-features {
+  list-style: none;
+  margin-bottom: 20px;
+  flex: 1;
+}
+
+.plan-features li {
+  font-size: 13px;
+  color: #475467;
+  margin-bottom: 9px;
+}
+
+.plan-btn {
+  width: 100%;
+  border: none;
+  padding: 11px;
+  border-radius: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.plan-btn-basic {
+  background: #172033;
+  color: white;
+}
+
+.plan-btn-pro {
+  background: #25d366;
+  color: white;
+}
+
+.plan-btn-business {
+  background: #7c3aed;
+  color: white;
+}
+
+.plan-btn:hover {
+  opacity: .9;
+  transform: translateY(-1px);
+}
+
+.upgrade-note {
+  text-align: center;
+  color: #667085;
+  font-size: 12px;
+  margin-top: 20px;
+}
+
+@media(max-width: 800px) {
+
+  .pricing-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+}
+
+@media(max-width: 500px) {
+
+  .upgrade-modal-content {
+    padding: 20px;
+  }
+
+  .upgrade-header h2 {
+    font-size: 23px;
+    padding-right: 30px;
+  }
+
+  .pricing-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
   
 </style>
 </head>
@@ -1319,6 +1521,235 @@ header {
   </div>
 
 </div>
+
+  <!-- =========================================================
+     UPGRADE / SUBSCRIPTION MODAL
+     ========================================================= -->
+
+<div id="upgradeModal" class="upgrade-modal">
+
+  <div class="upgrade-modal-content">
+
+    <div class="upgrade-header">
+
+      <button
+        type="button"
+        class="close-upgrade-btn"
+        onclick="closeUpgradePopup()"
+      >
+        ×
+      </button>
+
+      <div style="font-size:42px; margin-bottom:8px;">
+        🚀
+      </div>
+
+      <h2>Upgrade Your Plan</h2>
+
+      <p>
+        You've reached your Free Plan limit.
+        Choose a plan that fits your business.
+      </p>
+
+    </div>
+
+
+    <div class="pricing-grid">
+
+
+      <!-- BASIC -->
+
+      <div class="pricing-card">
+
+        <div class="plan-icon">
+          🟢
+        </div>
+
+        <div class="plan-name">
+          Basic
+        </div>
+
+        <div class="plan-price">
+          ₹250
+        </div>
+
+        <div class="plan-period">
+          per month
+        </div>
+
+        <div class="plan-orders">
+          📦 100 orders / month
+        </div>
+
+        <ul class="plan-features">
+
+          <li>✓ 100 orders</li>
+          <li>✓ Customer management</li>
+          <li>✓ WhatsApp messaging</li>
+          <li>✓ Order history</li>
+          <li>✓ Search & filters</li>
+
+        </ul>
+
+        <button
+          class="plan-btn plan-btn-basic"
+          onclick="selectPlan('basic')"
+        >
+          Upgrade to Basic
+        </button>
+
+      </div>
+
+
+      <!-- PRO -->
+
+      <div class="pricing-card featured">
+
+        <div class="popular-badge">
+          ⭐ MOST POPULAR
+        </div>
+
+        <div class="plan-icon">
+          🔥
+        </div>
+
+        <div class="plan-name">
+          Pro
+        </div>
+
+        <div class="plan-price">
+          ₹799
+        </div>
+
+        <div class="plan-period">
+          per month
+        </div>
+
+        <div class="plan-orders">
+          📦 500 orders / month
+        </div>
+
+        <ul class="plan-features">
+
+          <li>✓ 500 orders</li>
+          <li>✓ Customer management</li>
+          <li>✓ WhatsApp messaging</li>
+          <li>✓ Order history</li>
+          <li>✓ Search & filters</li>
+
+        </ul>
+
+        <button
+          class="plan-btn plan-btn-pro"
+          onclick="selectPlan('pro')"
+        >
+          Upgrade to Pro
+        </button>
+
+      </div>
+
+
+      <!-- BUSINESS -->
+
+      <div class="pricing-card">
+
+        <div class="plan-icon">
+          💎
+        </div>
+
+        <div class="plan-name">
+          Business
+        </div>
+
+        <div class="plan-price">
+          ₹1,499
+        </div>
+
+        <div class="plan-period">
+          per month
+        </div>
+
+        <div class="plan-orders">
+          📦 Unlimited orders
+        </div>
+
+        <ul class="plan-features">
+
+          <li>✓ Unlimited orders</li>
+          <li>✓ Customer management</li>
+          <li>✓ WhatsApp messaging</li>
+          <li>✓ Order history</li>
+          <li>✓ Search & filters</li>
+
+        </ul>
+
+        <button
+          class="plan-btn plan-btn-business"
+          onclick="selectPlan('business')"
+        >
+          Upgrade to Business
+        </button>
+
+      </div>
+
+
+      <!-- FREE -->
+
+      <div class="pricing-card">
+
+        <div class="plan-icon">
+          🆓
+        </div>
+
+        <div class="plan-name">
+          Free
+        </div>
+
+        <div class="plan-price">
+          ₹0
+        </div>
+
+        <div class="plan-period">
+          forever
+        </div>
+
+        <div class="plan-orders">
+          📦 5 orders total
+        </div>
+
+        <ul class="plan-features">
+
+          <li>✓ 5 orders</li>
+          <li>✓ Customer management</li>
+          <li>✓ WhatsApp messaging</li>
+          <li>✓ Order history</li>
+          <li>✓ Search & filters</li>
+
+        </ul>
+
+        <button
+          class="plan-btn"
+          style="background:#f1f5f9;color:#667085;"
+          onclick="closeUpgradePopup()"
+        >
+          Current Plan
+        </button>
+
+      </div>
+
+
+    </div>
+
+
+    <div class="upgrade-note">
+
+      🔒 Secure payments will be added in the next step.
+
+    </div>
+
+  </div>
+
+</div>
   
 <script>
 
@@ -1604,7 +2035,108 @@ async function addOrder() {
     return;
   }
 
+  /* =====================================================
+     FREE PLAN — 5 ORDER LIMIT
+     ===================================================== */
 
+  const {
+    data: subscription,
+    error: subscriptionError
+  } = await supabaseClient
+    .from("subscriptions")
+    .select("*")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (subscriptionError) {
+
+    console.error(subscriptionError);
+
+    showOrderMessage(
+      "Unable to check your subscription."
+    );
+
+    return;
+  }
+
+
+  /* Create Free subscription if user does not have one */
+
+  if (!subscription) {
+
+    const { error: createSubscriptionError } =
+      await supabaseClient
+        .from("subscriptions")
+        .insert({
+          user_id: user.id,
+          plan: "free",
+          status: "active",
+          order_limit: 5
+        });
+
+    if (createSubscriptionError) {
+
+      console.error(createSubscriptionError);
+
+      showOrderMessage(
+        "Unable to create your subscription."
+      );
+
+      return;
+    }
+
+  }
+
+
+  /* Get current order count */
+
+  const {
+    count: currentOrderCount,
+    error: orderCountError
+  } = await supabaseClient
+    .from("orders")
+    .select("*", {
+      count: "exact",
+      head: true
+    })
+    .eq("user_id", user.id);
+
+
+  if (orderCountError) {
+
+    console.error(orderCountError);
+
+    showOrderMessage(
+      "Unable to check your order limit."
+    );
+
+    return;
+  }
+
+
+  const currentPlan =
+    subscription?.plan || "free";
+
+  const orderLimit =
+    subscription?.order_limit || 5;
+
+
+  /* Block order when limit is reached */
+
+  if (
+    currentPlan === "free" &&
+    currentOrderCount >= 5
+  ) {
+
+    showOrderMessage(
+      "🚫 You have reached your 5-order Free Plan limit. Please upgrade to add more orders."
+    );
+
+    showUpgradePopup();
+
+    return;
+  }
+  
   const { error } =
     await supabaseClient
       .from("orders")
@@ -2843,7 +3375,95 @@ function closeCustomerProfile() {
 
 }
 
+/* =========================================================
+   UPGRADE / SUBSCRIPTION POPUP
+   ========================================================= */
 
+function showUpgradePopup() {
+
+  const upgradeModal =
+    document.getElementById("upgradeModal");
+
+  if (!upgradeModal) return;
+
+  upgradeModal.classList.add("show");
+
+  document.body.style.overflow = "hidden";
+
+}
+
+
+/* CLOSE UPGRADE POPUP */
+
+function closeUpgradePopup() {
+
+  const upgradeModal =
+    document.getElementById("upgradeModal");
+
+  if (!upgradeModal) return;
+
+  upgradeModal.classList.remove("show");
+
+  document.body.style.overflow = "";
+
+}
+
+
+/* SELECT PLAN */
+
+function selectPlan(plan) {
+
+  const planNames = {
+
+    basic: "Basic",
+
+    pro: "Pro",
+
+    business: "Business"
+
+  };
+
+
+  const planName =
+    planNames[plan] || "selected plan";
+
+
+  alert(
+    "🚀 " +
+    planName +
+    " selected!\n\n" +
+    "Payment setup is coming in the next step."
+  );
+
+}
+
+
+/* CLOSE WHEN CLICKING OUTSIDE */
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const upgradeModal =
+    document.getElementById("upgradeModal");
+
+
+  if (!upgradeModal) return;
+
+
+  upgradeModal.addEventListener(
+    "click",
+    function(event) {
+
+      if (event.target === upgradeModal) {
+
+        closeUpgradePopup();
+
+      }
+
+    }
+  );
+
+});
+  
 /* =========================================================
    ANDROID / BROWSER BACK BUTTON
    ========================================================= */
