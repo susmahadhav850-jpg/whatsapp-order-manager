@@ -1355,11 +1355,7 @@ header {
 
 </div>
 
-  </main>
-
-</div>
-
-  <!-- CUSTOMERS -->
+    <!-- CUSTOMERS -->
 
 <div class="panel">
 
@@ -1383,6 +1379,10 @@ header {
     </div>
 
   </div>
+
+</div>
+    
+  </main>
 
 </div>
   
@@ -1958,6 +1958,145 @@ async function logout() {
 
 }
 
+/* =========================================================
+   CHECK FREE PLAN LIMIT ON LOGIN
+   ========================================================= */
+
+async function checkOrderLimitOnLogin() {
+
+  const {
+    data: {
+      user
+    }
+  } = await supabaseClient.auth.getUser();
+
+
+  if (!user) {
+    return;
+  }
+
+
+  /* =====================================================
+     GET SUBSCRIPTION
+     ===================================================== */
+
+  const {
+    data: subscription,
+    error: subscriptionError
+  } = await supabaseClient
+    .from("subscriptions")
+    .select("*")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+
+  if (subscriptionError) {
+
+    console.error(
+      "Subscription check error:",
+      subscriptionError
+    );
+
+    return;
+  }
+
+
+  /*
+    If the user does not have a subscription yet,
+    the addOrder() function will create it later.
+  */
+
+  if (!subscription) {
+    return;
+  }
+
+
+  /* =====================================================
+     GET ORDER COUNT
+     ===================================================== */
+
+  const {
+    count,
+    error: orderCountError
+  } = await supabaseClient
+    .from("orders")
+    .select("*", {
+
+      count: "exact",
+
+      head: true
+
+    })
+    .eq("user_id", user.id);
+
+
+  if (orderCountError) {
+
+    console.error(
+      "Order count error:",
+      orderCountError
+    );
+
+    return;
+  }
+
+
+  /* =====================================================
+     PLAN INFORMATION
+     ===================================================== */
+
+  const currentPlan =
+    String(
+      subscription.plan || "free"
+    ).toLowerCase();
+
+
+  const orderLimit =
+    Number(
+      subscription.order_limit
+    ) || 5;
+
+
+  console.log(
+    "Login Plan:",
+    currentPlan
+  );
+
+  console.log(
+    "Login Order Count:",
+    count
+  );
+
+  console.log(
+    "Login Order Limit:",
+    orderLimit
+  );
+
+
+  /* =====================================================
+     SHOW POPUP IF FREE LIMIT REACHED
+     ===================================================== */
+
+  if (
+    currentPlan === "free" &&
+    count >= orderLimit
+  ) {
+
+    /*
+      Small delay allows the dashboard
+      to finish rendering first.
+    */
+
+    setTimeout(() => {
+
+      showUpgradePopup();
+
+    }, 600);
+
+  }
+
+}
+
 
 /* =========================================================
    SHOW DASHBOARD
@@ -1966,14 +2105,27 @@ async function logout() {
 async function showDashboard(user) {
 
   authScreen.style.display = "none";
+
   dashboard.style.display = "block";
 
   logoutBtn.style.display = "block";
+
   userEmail.textContent = user.email;
+
+
+  /* LOAD ORDERS */
 
   await loadOrders();
 
+
+  /* LOAD CUSTOMERS */
+
   await loadCustomers();
+
+
+  /* CHECK FREE PLAN */
+
+  await checkOrderLimitOnLogin();
 
 }
 
@@ -1990,11 +2142,7 @@ async function addOrder() {
   } = await supabaseClient.auth.getUser();
 
   if (!user) {
-
-    showOrderMessage(
-      "You are not logged in."
-    );
-
+    showOrderMessage("You are not logged in.");
     return;
   }
 
@@ -2017,29 +2165,24 @@ async function addOrder() {
     document.getElementById("status").value;
 
 
+  /* VALIDATION */
+
   if (!customerName) {
-
-    showOrderMessage(
-      "Please enter the customer name."
-    );
-
+    showOrderMessage("Please enter the customer name.");
     return;
   }
 
   if (!productName) {
-
-    showOrderMessage(
-      "Please enter the product name."
-    );
-
+    showOrderMessage("Please enter the product name.");
     return;
   }
 
+
   /* =====================================================
-     FREE PLAN — 5 ORDER LIMIT
+     GET SUBSCRIPTION
      ===================================================== */
 
-  const {
+  let {
     data: subscription,
     error: subscriptionError
   } = await supabaseClient
@@ -2047,6 +2190,7 @@ async function addOrder() {
     .select("*")
     .eq("user_id", user.id)
     .maybeSingle();
+
 
   if (subscriptionError) {
 
@@ -2060,19 +2204,26 @@ async function addOrder() {
   }
 
 
-  /* Create Free subscription if user does not have one */
+  /* =====================================================
+     CREATE FREE SUBSCRIPTION IF NEEDED
+     ===================================================== */
 
   if (!subscription) {
 
-    const { error: createSubscriptionError } =
-      await supabaseClient
-        .from("subscriptions")
-        .insert({
-          user_id: user.id,
-          plan: "free",
-          status: "active",
-          order_limit: 5
-        });
+    const {
+      data: newSubscription,
+      error: createSubscriptionError
+    } = await supabaseClient
+      .from("subscriptions")
+      .insert({
+        user_id: user.id,
+        plan: "free",
+        status: "active",
+        order_limit: 5
+      })
+      .select()
+      .single();
+
 
     if (createSubscriptionError) {
 
@@ -2085,10 +2236,15 @@ async function addOrder() {
       return;
     }
 
+    /* IMPORTANT:
+       Use the newly created subscription */
+    subscription = newSubscription;
   }
 
 
-  /* Get current order count */
+  /* =====================================================
+     GET CURRENT ORDER COUNT
+     ===================================================== */
 
   const {
     count: currentOrderCount,
@@ -2114,49 +2270,68 @@ async function addOrder() {
   }
 
 
+  /* =====================================================
+     PLAN INFORMATION
+     ===================================================== */
+
   const currentPlan =
-    subscription?.plan || "free";
+    subscription.plan || "free";
 
   const orderLimit =
-    subscription?.order_limit || 5;
+    Number(subscription.order_limit) || 5;
 
 
-  /* Block order when limit is reached */
+  console.log("Subscription:", subscription);
+  console.log("Current orders:", currentOrderCount);
+  console.log("Order limit:", orderLimit);
+
+
+  /* =====================================================
+     CHECK ORDER LIMIT
+     ===================================================== */
 
   if (
     currentPlan === "free" &&
-    currentOrderCount >= 5
+    currentOrderCount >= orderLimit
   ) {
 
     showOrderMessage(
-      "🚫 You have reached your 5-order Free Plan limit. Please upgrade to add more orders."
+      "🚫 You have reached your Free Plan limit."
     );
+
+    /* SHOW UPGRADE POPUP */
 
     showUpgradePopup();
 
     return;
   }
-  
-  const { error } =
-    await supabaseClient
-      .from("orders")
-      .insert({
 
-        user_id: user.id,
 
-        customer_name: customerName,
+  /* =====================================================
+     ADD ORDER
+     ===================================================== */
 
-        whatsapp_number: whatsappNumber,
+  const {
+    error
+  } = await supabaseClient
+    .from("orders")
+    .insert({
 
-        product_name: productName,
+      user_id: user.id,
 
-        quantity: quantity,
+      customer_name: customerName,
 
-        amount: amount,
+      whatsapp_number: whatsappNumber,
 
-        status: status
+      product_name: productName,
 
-      });
+      quantity: quantity,
+
+      amount: amount,
+
+      status: status
+
+    });
 
 
   if (error) {
@@ -2171,13 +2346,17 @@ async function addOrder() {
   }
 
 
+  /* =====================================================
+     SUCCESS
+     ===================================================== */
+
   showOrderMessage(
     "Order added successfully! 🎉",
     "success"
   );
 
 
-  /* Clear form */
+  /* CLEAR FORM */
 
   document.getElementById("customerName").value = "";
   document.getElementById("whatsappNumber").value = "";
@@ -2187,11 +2366,12 @@ async function addOrder() {
   document.getElementById("status").value = "Pending";
 
 
+  /* REFRESH */
+
   await loadOrders();
-await loadCustomers();
+  await loadCustomers();
 
 }
-
 
 /* =========================================================
    LOAD ORDERS
@@ -3376,7 +3556,7 @@ function closeCustomerProfile() {
 }
 
 /* =========================================================
-   UPGRADE / SUBSCRIPTION POPUP
+   SHOW UPGRADE POPUP
    ========================================================= */
 
 function showUpgradePopup() {
@@ -3384,30 +3564,47 @@ function showUpgradePopup() {
   const upgradeModal =
     document.getElementById("upgradeModal");
 
-  if (!upgradeModal) return;
+
+  if (!upgradeModal) {
+
+    console.error(
+      "Upgrade modal not found."
+    );
+
+    return;
+  }
+
 
   upgradeModal.classList.add("show");
+
+  upgradeModal.style.display = "flex";
 
   document.body.style.overflow = "hidden";
 
 }
 
-
-/* CLOSE UPGRADE POPUP */
+/* =========================================================
+   CLOSE UPGRADE POPUP
+   ========================================================= */
 
 function closeUpgradePopup() {
 
   const upgradeModal =
     document.getElementById("upgradeModal");
 
-  if (!upgradeModal) return;
+
+  if (!upgradeModal) {
+    return;
+  }
+
 
   upgradeModal.classList.remove("show");
+
+  upgradeModal.style.display = "none";
 
   document.body.style.overflow = "";
 
 }
-
 
 /* SELECT PLAN */
 
