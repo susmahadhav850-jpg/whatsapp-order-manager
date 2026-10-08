@@ -1714,12 +1714,12 @@ header {
         </div>
 
         <div class="plan-orders">
-          📦 5 orders total
+          📦 5 orders / day
         </div>
 
         <ul class="plan-features">
 
-          <li>✓ 5 orders</li>
+          <li>✓ 5 orders per day</li>
           <li>✓ Customer management</li>
           <li>✓ WhatsApp messaging</li>
           <li>✓ Order history</li>
@@ -2010,25 +2010,28 @@ async function checkOrderLimitOnLogin() {
     return;
   }
 
+/* =====================================================
+   GET TODAY'S ORDER COUNT
+   ===================================================== */
 
-  /* =====================================================
-     GET ORDER COUNT
-     ===================================================== */
+const startOfToday = new Date();
+startOfToday.setHours(0, 0, 0, 0);
 
-  const {
-    count,
-    error: orderCountError
-  } = await supabaseClient
-    .from("orders")
-    .select("*", {
+const startOfTomorrow = new Date(startOfToday);
+startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
 
-      count: "exact",
-
-      head: true
-
-    })
-    .eq("user_id", user.id);
-
+const {
+  count,
+  error: orderCountError
+} = await supabaseClient
+  .from("orders")
+  .select("*", {
+    count: "exact",
+    head: true
+  })
+  .eq("user_id", user.id)
+  .gte("created_at", startOfToday.toISOString())
+  .lt("created_at", startOfTomorrow.toISOString());
 
   if (orderCountError) {
 
@@ -2239,22 +2242,40 @@ if (subscriptionError) {
     subscription = newSubscription;
   }
 
+/* =====================================================
+   GET TODAY'S ORDER COUNT
+   ===================================================== */
 
-  /* =====================================================
-     GET CURRENT ORDER COUNT
-     ===================================================== */
+const startOfToday = new Date();
+startOfToday.setHours(0, 0, 0, 0);
 
-  const {
-    count: currentOrderCount,
-    error: orderCountError
-  } = await supabaseClient
-    .from("orders")
-    .select("*", {
-      count: "exact",
-      head: true
-    })
-    .eq("user_id", user.id);
+const startOfTomorrow = new Date(startOfToday);
+startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
 
+const {
+  count: currentOrderCount,
+  error: orderCountError
+} = await supabaseClient
+  .from("orders")
+  .select("*", {
+    count: "exact",
+    head: true
+  })
+  .eq("user_id", user.id)
+  .gte("created_at", startOfToday.toISOString())
+  .lt("created_at", startOfTomorrow.toISOString());
+
+
+if (orderCountError) {
+
+  console.error(orderCountError);
+
+  showOrderMessage(
+    "Unable to check today's order limit."
+  );
+
+  return;
+}
 
   if (orderCountError) {
 
