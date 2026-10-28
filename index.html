@@ -1935,6 +1935,8 @@ async function login() {
     return;
   }
 
+  } // Close the login() function
+  
 /* =========================================================
    LOGOUT
    ========================================================= */
@@ -3884,7 +3886,7 @@ supabaseClient.auth.onAuthStateChange(
 
 /* START */
 
-
+// Restore the user's login session when the app opens. checkSession();
 
 </script>
 
