@@ -2399,28 +2399,47 @@ if (orderCountError) {
      ADD ORDER
      ===================================================== */
 
-  const {
-    error
-  } = await supabaseClient
-    .from("orders")
-    .insert({
+/* UPLOAD PRODUCT IMAGE */
 
-      user_id: user.id,
+let productImageUrl = null;
 
-      customer_name: customerName,
+try {
+if (imageFile) {
+showOrderMessage("Uploading product image...", "success");
 
-      whatsapp_number: whatsappNumber,
+productImageUrl = await uploadProductImage(
+  imageFile,
+  user.id
+);
 
-      product_name: productName,
+}
+} catch (uploadError) {
+console.error("Image upload error:", uploadError);
 
-      quantity: quantity,
+showOrderMessage(
+"Image upload failed: " + uploadError.message
+);
 
-      amount: amount,
+return;
+}
 
-      status: status
+/* SAVE ORDER */
 
-    });
-
+const {
+error
+} = await supabaseClient
+.from("orders")
+.insert({
+user_id: user.id,
+customer_name: customerName,
+whatsapp_number: whatsappNumber,
+product_name: productName,
+product_brand: productBrand || null,
+product_image_url: productImageUrl,
+quantity: quantity,
+amount: amount,
+status: status
+});
 
   if (error) {
 
