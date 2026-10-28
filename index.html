@@ -2156,6 +2156,56 @@ async function showDashboard(user) {
 }
 
 /* =========================================================
+UPLOAD PRODUCT IMAGE
+========================================================= */
+
+async function uploadProductImage(file, userId) {
+if (!file) {
+return null;
+}
+
+const allowedTypes = [
+"image/jpeg",
+"image/png",
+"image/webp"
+];
+
+if (!allowedTypes.includes(file.type)) {
+throw new Error("Please select a JPG, PNG, or WebP image.");
+}
+
+if (file.size > 5 * 1024 * 1024) {
+throw new Error("Image must be 5 MB or smaller.");
+}
+
+const extension = file.type === "image/jpeg"
+? "jpg"
+: file.type.split("/")[1];
+
+const filePath =
+"${userId}/${crypto.randomUUID()}.${extension}";
+
+const { data, error } = await supabaseClient
+.storage
+.from("product-images")
+.upload(filePath, file, {
+contentType: file.type,
+upsert: false
+});
+
+if (error) {
+throw error;
+}
+
+const { data: publicData } = supabaseClient
+.storage
+.from("product-images")
+.getPublicUrl(data.path);
+
+return publicData.publicUrl;
+}
+  
+/* =========================================================
    ADD ORDER
    ========================================================= */
 
@@ -2180,7 +2230,10 @@ async function addOrder() {
 
   const productName =
     document.getElementById("productName").value.trim();
-
+    document.getElementById("productBrand").value = "";
+    document.getElementById("productImage").value = "";
+    document.getElementById("productImagePreview").innerHTML = "";
+  
   const quantity =
     parseInt(document.getElementById("quantity").value) || 1;
 
@@ -2190,6 +2243,11 @@ async function addOrder() {
   const status =
     document.getElementById("status").value;
 
+  const imageFile =
+  document.getElementById("productImage").files[0] || null;
+
+  const productBrand =
+  document.getElementById("productBrand").value.trim();
 
   /* VALIDATION */
 
