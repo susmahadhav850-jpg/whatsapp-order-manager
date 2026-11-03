@@ -2229,10 +2229,22 @@ async function addOrder() {
     document.getElementById("whatsappNumber").value.trim();
 
   const productName =
-    document.getElementById("productName").value.trim();
-    document.getElementById("productBrand").value = "";
-    document.getElementById("productImage").value = "";
-    document.getElementById("productImagePreview").innerHTML = "";
+  document.getElementById("productName").value.trim();
+
+const quantity =
+  parseInt(document.getElementById("quantity").value) || 1;
+
+const amount =
+  parseFloat(document.getElementById("amount").value) || 0;
+
+const status =
+  document.getElementById("status").value;
+
+const imageFile =
+  document.getElementById("productImage").files[0] || null;
+
+const productBrand =
+  document.getElementById("productBrand").value.trim();
   
   const quantity =
     parseInt(document.getElementById("quantity").value) || 1;
