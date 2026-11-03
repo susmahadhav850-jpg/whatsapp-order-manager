@@ -2183,7 +2183,7 @@ const extension = file.type === "image/jpeg"
 : file.type.split("/")[1];
 
 const filePath =
-"${userId}/${crypto.randomUUID()}.${extension}";
+`${userId}/${crypto.randomUUID()}.${extension}`;
 
 const { data, error } = await supabaseClient
 .storage
