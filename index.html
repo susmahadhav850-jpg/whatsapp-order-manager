@@ -3630,20 +3630,20 @@ history.pushState(
 
 function closeCustomerProfile() {
 
-  const customerModal =
-    document.getElementById("customerModal");
+const customerModal =
+document.getElementById("customerModal");
 
-  if (!customerModal) return;
+if (!customerModal) return;
 
-  customerModal.classList.remove("show");
+customerModal.classList.remove("show");
 
-  /* Restore page scrolling */
-  document.body.style.overflow = "";
+customerModal.style.display = "none";
 
-  /* Remove the browser history entry */
-  if (history.state && history.state.customerProfile) {
-    history.back();
-  }
+document.body.style.overflow = "";
+
+if (history.state && history.state.customerProfile) {
+history.back();
+}
 
 }
 
